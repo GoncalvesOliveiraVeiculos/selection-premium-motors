@@ -1,87 +1,8 @@
 import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import { MessageCircle, Eye, Gauge, Calendar, Fuel } from "lucide-react";
-
-import car1 from "@/assets/car-1.jpg";
-import car2 from "@/assets/car-2.jpg";
-import car3 from "@/assets/car-3.jpg";
-import car4 from "@/assets/car-4.jpg";
-import car5 from "@/assets/car-5.jpg";
-import car6 from "@/assets/car-6.jpg";
-
-interface Vehicle {
-  id: number;
-  image: string;
-  name: string;
-  price: string;
-  year: string;
-  km: string;
-  fuel: string;
-  category: "todos" | "novos" | "seminovos" | "luxo";
-}
-
-const vehicles: Vehicle[] = [
-  {
-    id: 1,
-    image: car1,
-    name: "Lamborghini Urus",
-    price: "R$ 2.890.000",
-    year: "2024",
-    km: "5.000 km",
-    fuel: "Gasolina",
-    category: "luxo",
-  },
-  {
-    id: 2,
-    image: car2,
-    name: "Porsche 911 Turbo S",
-    price: "R$ 1.650.000",
-    year: "2023",
-    km: "12.000 km",
-    fuel: "Gasolina",
-    category: "luxo",
-  },
-  {
-    id: 3,
-    image: car3,
-    name: "Mercedes-AMG GT",
-    price: "R$ 980.000",
-    year: "2024",
-    km: "3.500 km",
-    fuel: "Gasolina",
-    category: "novos",
-  },
-  {
-    id: 4,
-    image: car4,
-    name: "Ferrari 488 GTB",
-    price: "R$ 2.450.000",
-    year: "2022",
-    km: "18.000 km",
-    fuel: "Gasolina",
-    category: "luxo",
-  },
-  {
-    id: 5,
-    image: car5,
-    name: "BMW M4 Competition",
-    price: "R$ 720.000",
-    year: "2024",
-    km: "1.200 km",
-    fuel: "Gasolina",
-    category: "novos",
-  },
-  {
-    id: 6,
-    image: car6,
-    name: "Audi RS7 Sportback",
-    price: "R$ 890.000",
-    year: "2023",
-    km: "22.000 km",
-    fuel: "Gasolina",
-    category: "seminovos",
-  },
-];
+import { vehicles } from "@/data/vehicles";
 
 const filters = [
   { id: "todos", label: "Todos" },
@@ -197,7 +118,7 @@ const VehiclesSection = () => {
                 {/* Actions */}
                 <div className="flex gap-3">
                   <a
-                    href="https://wa.me/5531993601885"
+                    href={`https://wa.me/5531993601885?text=${encodeURIComponent(`Olá! Tenho interesse no ${vehicle.name} (${vehicle.year}) - ${vehicle.price}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-whatsapp flex-1 flex items-center justify-center gap-2 text-sm py-3"
@@ -205,10 +126,13 @@ const VehiclesSection = () => {
                     <MessageCircle size={16} />
                     <span>WhatsApp</span>
                   </a>
-                  <button className="flex-1 flex items-center justify-center gap-2 text-sm py-3 border border-primary/30 rounded-lg text-primary hover:bg-primary/10 transition-colors">
+                  <Link
+                    to={`/veiculo/${vehicle.slug}`}
+                    className="flex-1 flex items-center justify-center gap-2 text-sm py-3 border border-primary/30 rounded-lg text-primary hover:bg-primary/10 transition-colors"
+                  >
                     <Eye size={16} />
                     <span>Detalhes</span>
-                  </button>
+                  </Link>
                 </div>
               </div>
             </motion.div>
