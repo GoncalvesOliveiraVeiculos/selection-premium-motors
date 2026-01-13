@@ -151,9 +151,9 @@ const ContactSection = () => {
                       Endereço
                     </h4>
                     <p className="text-muted-foreground text-sm">
-                      Rua Exemplo, 123
+                      Av. Barão Homem de Melo, 4386
                       <br />
-                      Belo Horizonte, MG
+                      Estoril - Belo Horizonte, MG
                     </p>
                   </div>
                 </div>

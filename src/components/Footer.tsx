@@ -101,8 +101,8 @@ const Footer = () => {
               Contato
             </h4>
             <div className="space-y-3 text-muted-foreground">
-              <p>Rua Exemplo, 123</p>
-              <p>Belo Horizonte, MG</p>
+              <p>Av. Barão Homem de Melo, 4386</p>
+              <p>Estoril - Belo Horizonte, MG</p>
               <a
                 href="tel:+5531997864381"
                 className="block hover:text-primary transition-colors"
