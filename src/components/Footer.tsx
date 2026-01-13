@@ -125,7 +125,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="pt-8 border-t border-border/50 text-center">
           <p className="text-muted-foreground text-sm">
-            © {currentYear} Selection Veículos. Todos os direitos reservados.
+            © {currentYear} Selection Veículos CNPJ 64.451.458/0001-40. Todos os direitos reservados.
           </p>
         </div>
       </div>
