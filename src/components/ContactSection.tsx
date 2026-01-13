@@ -21,7 +21,7 @@ const ContactSection = () => {
       `Olá! Meu nome é ${formData.name}. ${formData.message} Meu telefone: ${formData.phone}`
     );
     
-    window.open(`https://wa.me/5531993601885?text=${message}`, "_blank");
+    window.open(`https://wa.me/5531997864381?text=${message}`, "_blank");
     
     toast({
       title: "Redirecionando para WhatsApp",
@@ -169,10 +169,10 @@ const ContactSection = () => {
                       Telefone
                     </h4>
                     <a
-                      href="tel:+5531993601885"
+                      href="tel:+5531997864381"
                       className="text-muted-foreground text-sm hover:text-primary transition-colors"
                     >
-                      (31) 9 9360-1885
+                      (31) 9 7864-4381
                     </a>
                   </div>
                 </div>
@@ -188,7 +188,7 @@ const ContactSection = () => {
                       WhatsApp
                     </h4>
                     <a
-                      href="https://wa.me/5531993601885"
+                      href="https://wa.me/5531997864381"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-muted-foreground text-sm hover:text-[hsl(var(--whatsapp))] transition-colors"

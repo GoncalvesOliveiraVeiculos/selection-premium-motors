@@ -44,6 +44,9 @@ const AboutSection = () => {
             encontrar as melhores oportunidades de negócio em Belo Horizonte e
             região.
           </p>
+          <p className="text-muted-foreground text-sm mt-4">
+            CNPJ: 64.451.458/0001-40
+          </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">

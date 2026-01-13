@@ -84,17 +84,17 @@ const Header = () => {
           {/* CTA Buttons Desktop */}
           <div className="hidden lg:flex items-center gap-4">
             <motion.a
-              href="tel:+5531993601885"
+              href="tel:+5531997864381"
               className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors text-sm font-medium"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
               <Phone size={16} />
-              <span>(31) 9 9360-1885</span>
+              <span>(31) 9 7864-4381</span>
             </motion.a>
             <motion.a
-              href="https://wa.me/5531993601885"
+              href="https://wa.me/5531997864381"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-whatsapp flex items-center gap-2 text-sm"
@@ -143,14 +143,14 @@ const Header = () => {
               ))}
               <div className="flex flex-col gap-3 pt-4 border-t border-border/50">
                 <a
-                  href="tel:+5531993601885"
+                  href="tel:+5531997864381"
                   className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors font-medium"
                 >
                   <Phone size={18} />
-                  <span>(31) 9 9360-1885</span>
+                  <span>(31) 9 7864-4381</span>
                 </a>
                 <a
-                  href="https://wa.me/5531993601885"
+                  href="https://wa.me/5531997864381"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-whatsapp flex items-center justify-center gap-2"
