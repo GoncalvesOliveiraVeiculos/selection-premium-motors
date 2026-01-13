@@ -48,7 +48,7 @@ const Footer = () => {
                 <Facebook size={20} className="text-foreground" />
               </a>
               <a
-                href="https://wa.me/5531993601885"
+                href="https://wa.me/5531997864381"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-[hsl(var(--whatsapp))]/20 flex items-center justify-center hover:bg-[hsl(var(--whatsapp))]/30 transition-colors"
@@ -57,6 +57,9 @@ const Footer = () => {
                 <MessageCircle size={20} className="text-[hsl(var(--whatsapp))]" />
               </a>
             </div>
+            <p className="text-muted-foreground text-sm mt-4">
+              CNPJ: 64.451.458/0001-40
+            </p>
           </div>
 
           {/* Quick Links */}
@@ -101,13 +104,13 @@ const Footer = () => {
               <p>Rua Exemplo, 123</p>
               <p>Belo Horizonte, MG</p>
               <a
-                href="tel:+5531993601885"
+                href="tel:+5531997864381"
                 className="block hover:text-primary transition-colors"
               >
-                (31) 9 9360-1885
+                (31) 9 7864-4381
               </a>
               <a
-                href="https://wa.me/5531993601885"
+                href="https://wa.me/5531997864381"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-[hsl(var(--whatsapp))] hover:opacity-80 transition-opacity"
