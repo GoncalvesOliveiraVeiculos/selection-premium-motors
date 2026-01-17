@@ -9,6 +9,13 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  preview: {
+    host: "0.0.0.0",
+    // Em plataformas como Koyeb, o app é acessado por um host externo (ex: *.koyeb.app).
+    // O Vite Preview bloqueia hosts não permitidos por segurança (DNS rebinding).
+    // Se quiser restringir mais, troque `true` por uma lista de hosts permitidos.
+    allowedHosts: true,
+  },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
     alias: {
