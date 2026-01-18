@@ -1,35 +1,20 @@
 import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
-
-const testimonials = [
-  {
-    id: 1,
-    name: "João S.",
-    text: "Atendimento impecável! Encontrei o carro dos meus sonhos com condições incríveis. Melhor decisão da minha vida.",
-    rating: 5,
-    location: "Belo Horizonte, MG",
-  },
-  {
-    id: 2,
-    name: "Maria L.",
-    text: "Profissionais extremamente qualificados. O processo de compra foi transparente e rápido. Recomendo a todos!",
-    rating: 5,
-    location: "Nova Lima, MG",
-  },
-  {
-    id: 3,
-    name: "Carlos A.",
-    text: "Já comprei 3 carros na Selection. Sempre com a mesma qualidade e atenção aos detalhes. São os melhores!",
-    rating: 5,
-    location: "Contagem, MG",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
 const TestimonialsSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  const q = useQuery({
+    queryKey: ["testimonials", { limit: 20 }],
+    queryFn: async () => (await api.listTestimonials(20)).testimonials,
+  });
+
+  const testimonials = q.data || [];
 
   const nextTestimonial = () => {
     setCurrentIndex((prev) => (prev + 1) % testimonials.length);
@@ -40,6 +25,8 @@ const TestimonialsSection = () => {
       (prev) => (prev - 1 + testimonials.length) % testimonials.length
     );
   };
+
+  const current = testimonials[currentIndex];
 
   return (
     <section className="py-24 bg-background" ref={ref}>
@@ -70,34 +57,46 @@ const TestimonialsSection = () => {
             {/* Quote Icon */}
             <Quote className="absolute top-6 left-6 w-12 h-12 text-primary/20" />
 
+            {q.isLoading && <p className="text-muted-foreground">Carregando depoimentos...</p>}
+            {q.isError && (
+              <p className="text-destructive">Erro ao carregar depoimentos. Verifique a API.</p>
+            )}
+            {!q.isLoading && !q.isError && testimonials.length === 0 && (
+              <p className="text-muted-foreground">Nenhum depoimento publicado ainda.</p>
+            )}
+
             {/* Stars */}
-            <div className="flex justify-center gap-1 mb-6">
-              {[...Array(testimonials[currentIndex].rating)].map((_, i) => (
-                <Star
-                  key={i}
-                  className="w-6 h-6 fill-primary text-primary"
-                />
-              ))}
-            </div>
+            {current && (
+              <div className="flex justify-center gap-1 mb-6">
+                {[...Array(current.rating ?? 5)].map((_, i) => (
+                  <Star key={i} className="w-6 h-6 fill-primary text-primary" />
+                ))}
+              </div>
+            )}
 
             {/* Text */}
-            <p className="text-lg md:text-xl text-foreground/90 mb-8 leading-relaxed">
-              "{testimonials[currentIndex].text}"
-            </p>
+            {current && (
+              <p className="text-lg md:text-xl text-foreground/90 mb-8 leading-relaxed">
+                "{current.text}"
+              </p>
+            )}
 
             {/* Author */}
-            <div>
-              <p className="font-display font-semibold text-foreground text-lg">
-                {testimonials[currentIndex].name}
-              </p>
-              <p className="text-muted-foreground text-sm">
-                {testimonials[currentIndex].location}
-              </p>
-            </div>
+            {current && (
+              <div>
+                <p className="font-display font-semibold text-foreground text-lg">
+                  {current.name}
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  {current.location ?? ""}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Navigation */}
-          <div className="flex justify-center items-center gap-4 mt-8">
+          {testimonials.length > 0 && (
+            <div className="flex justify-center items-center gap-4 mt-8">
             <button
               onClick={prevTestimonial}
               className="w-12 h-12 rounded-full border border-border hover:border-primary hover:bg-primary/10 flex items-center justify-center transition-colors"
@@ -130,6 +129,7 @@ const TestimonialsSection = () => {
               <ChevronRight className="w-5 h-5 text-foreground" />
             </button>
           </div>
+          )}
         </motion.div>
       </div>
     </section>

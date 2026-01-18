@@ -36,6 +36,28 @@ npm i
 npm run dev
 ```
 
+## Banco de dados (Postgres) e migrations
+
+Este repositório inclui migrations SQL em `db/migrations/` e um runner em `scripts/migrate.mjs`.
+
+- **Configuração**: copie `env.example` para `env.local` (ou `.env`) e preencha as variáveis.
+- **Rodar migrations**:
+
+```sh
+npm run db:migrate
+```
+
+## Backend (API + uploads)
+
+O backend fica em `server/index.mjs` e expõe:
+
+- `GET /api/health`
+- `POST /api/leads` (público)
+- `GET /api/admin/leads` (admin)
+- `POST /api/admin/uploads` (admin, multipart com campo `file`)
+
+Para proteger rotas admin, defina `ADMIN_API_KEY` e envie o header `x-admin-key`.
+
 **Edit a file directly in GitHub**
 
 - Navigate to the desired file(s).

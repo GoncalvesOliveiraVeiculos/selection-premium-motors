@@ -2,7 +2,9 @@ import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import { MessageCircle, Eye, Gauge, Calendar, Fuel } from "lucide-react";
-import { vehicles } from "@/data/vehicles";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { categoryLabel, formatKm } from "@/lib/format";
 
 const filters = [
   { id: "todos", label: "Todos" },
@@ -16,10 +18,17 @@ const VehiclesSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
-  const filteredVehicles =
-    activeFilter === "todos"
-      ? vehicles
-      : vehicles.filter((v) => v.category === activeFilter);
+  const q = useQuery({
+    queryKey: ["vehicles", { category: activeFilter }],
+    queryFn: async () =>
+      (
+        await api.listVehicles({
+          category: activeFilter === "todos" ? undefined : activeFilter,
+          limit: 60,
+        })
+      ).vehicles,
+  });
+  const vehicles = q.data || [];
 
   return (
     <section id="veiculos" className="py-24 bg-background" ref={ref}>
@@ -63,7 +72,13 @@ const VehiclesSection = () => {
 
         {/* Vehicles Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredVehicles.map((vehicle, index) => (
+          {q.isLoading && (
+            <div className="card-premium p-6 text-muted-foreground">Carregando veículos...</div>
+          )}
+          {q.isError && (
+            <div className="card-premium p-6 text-destructive">Erro ao carregar veículos.</div>
+          )}
+          {vehicles.map((vehicle, index) => (
             <motion.div
               key={vehicle.id}
               initial={{ opacity: 0, y: 30 }}
@@ -73,19 +88,19 @@ const VehiclesSection = () => {
             >
               {/* Image */}
               <div className="relative aspect-[4/3] overflow-hidden">
-                <img
-                  src={vehicle.image}
-                  alt={vehicle.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
+                {vehicle.coverImageUrl ? (
+                  <img
+                    src={vehicle.coverImageUrl}
+                    alt={vehicle.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-secondary/40" />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
                 <div className="absolute top-4 right-4">
                   <span className="bg-primary/90 text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full uppercase">
-                    {vehicle.category === "luxo"
-                      ? "Luxo"
-                      : vehicle.category === "novos"
-                      ? "Novo"
-                      : "Seminovo"}
+                    {categoryLabel(vehicle.category)}
                   </span>
                 </div>
               </div>
@@ -93,32 +108,32 @@ const VehiclesSection = () => {
               {/* Content */}
               <div className="p-6">
                 <h3 className="text-xl font-display font-bold text-foreground mb-2">
-                  {vehicle.name}
+                  {vehicle.title}
                 </h3>
                 <p className="text-2xl font-display font-bold text-primary mb-4">
-                  {vehicle.price}
+                  {vehicle.price ?? ""}
                 </p>
 
                 {/* Specs */}
                 <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-6">
                   <div className="flex items-center gap-1">
                     <Calendar size={14} className="text-primary" />
-                    <span>{vehicle.year}</span>
+                    <span>{vehicle.year ?? "-"}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Gauge size={14} className="text-primary" />
-                    <span>{vehicle.km}</span>
+                    <span>{formatKm(vehicle.mileageKm) || "-"}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Fuel size={14} className="text-primary" />
-                    <span>{vehicle.fuel}</span>
+                    <span>{vehicle.fuel ?? "-"}</span>
                   </div>
                 </div>
 
                 {/* Actions */}
                 <div className="flex gap-3">
                   <a
-                    href={`https://wa.me/5531993601885?text=${encodeURIComponent(`Olá! Tenho interesse no ${vehicle.name} (${vehicle.year}) - ${vehicle.price}`)}`}
+                    href={`https://wa.me/5531993601885?text=${encodeURIComponent(`Olá! Tenho interesse no ${vehicle.title} (${vehicle.year ?? ""}) - ${vehicle.price ?? ""}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-whatsapp flex-1 flex items-center justify-center gap-2 text-sm py-3"

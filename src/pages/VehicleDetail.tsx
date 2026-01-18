@@ -14,7 +14,9 @@ import {
   Check,
   Share2,
 } from "lucide-react";
-import { getVehicleBySlug, vehicles } from "@/data/vehicles";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { formatKm, categoryLabel } from "@/lib/format";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -24,9 +26,32 @@ import InterestForm from "@/components/InterestForm";
 
 const VehicleDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  const vehicle = getVehicleBySlug(slug || "");
+  const vehicleQ = useQuery({
+    queryKey: ["vehicle", slug],
+    enabled: Boolean(slug),
+    queryFn: async () => (await api.getVehicleBySlug(slug as string)).vehicle,
+  });
 
-  if (!vehicle) {
+  const relatedQ = useQuery({
+    queryKey: ["vehicles", "related", { limit: 20 }],
+    queryFn: async () => (await api.listVehicles({ limit: 20 })).vehicles,
+  });
+
+  const vehicle = vehicleQ.data;
+
+  if (vehicleQ.isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-muted-foreground">Carregando veículo...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (vehicleQ.isError || !vehicle) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Header />
@@ -54,15 +79,15 @@ const VehicleDetail = () => {
 
   const shareUrl = window.location.href;
   const whatsappMessage = encodeURIComponent(
-    `Olá! Tenho interesse no ${vehicle.name} (${vehicle.year}) - ${vehicle.price}. Gostaria de mais informações!`
+    `Olá! Tenho interesse no ${vehicle.title} (${vehicle.year ?? ""}) - ${vehicle.price ?? ""}. Gostaria de mais informações!`
   );
 
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${vehicle.name} | Selection Veículos`,
-          text: `Confira esse ${vehicle.name} (${vehicle.year}) por ${vehicle.price}`,
+          title: `${vehicle.title} | Selection Veículos`,
+          text: `Confira esse ${vehicle.title} (${vehicle.year ?? ""}) por ${vehicle.price ?? ""}`,
           url: shareUrl,
         });
       } catch (err) {
@@ -128,8 +153,8 @@ const VehicleDetail = () => {
                 animate={{ opacity: 1, y: 0 }}
               >
                 <VehicleGallery
-                  images={vehicle.gallery}
-                  vehicleName={vehicle.name}
+                  images={vehicle.images.map((i) => i.url)}
+                  vehicleName={vehicle.title}
                 />
               </motion.div>
 
@@ -143,20 +168,16 @@ const VehicleDetail = () => {
                 <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
                   <div>
                     <span className="bg-primary/20 text-primary text-xs font-semibold px-3 py-1 rounded-full uppercase mb-3 inline-block">
-                      {vehicle.category === "luxo"
-                        ? "Luxo"
-                        : vehicle.category === "novos"
-                        ? "Novo"
-                        : "Seminovo"}
+                      {categoryLabel(vehicle.category)}
                     </span>
                     <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
-                      {vehicle.name}
+                      {vehicle.title}
                     </h1>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">A partir de</p>
                     <p className="text-3xl md:text-4xl font-display font-bold text-primary">
-                      {vehicle.price}
+                      {vehicle.price ?? ""}
                     </p>
                   </div>
                 </div>
@@ -168,7 +189,7 @@ const VehicleDetail = () => {
                     <div>
                       <p className="text-xs text-muted-foreground">Ano</p>
                       <p className="font-semibold text-foreground">
-                        {vehicle.year}
+                        {vehicle.year ?? "-"}
                       </p>
                     </div>
                   </div>
@@ -177,7 +198,7 @@ const VehicleDetail = () => {
                     <div>
                       <p className="text-xs text-muted-foreground">KM</p>
                       <p className="font-semibold text-foreground">
-                        {vehicle.km}
+                        {formatKm(vehicle.mileageKm) || "-"}
                       </p>
                     </div>
                   </div>
@@ -186,7 +207,7 @@ const VehicleDetail = () => {
                     <div>
                       <p className="text-xs text-muted-foreground">Combustível</p>
                       <p className="font-semibold text-foreground">
-                        {vehicle.fuel}
+                        {vehicle.fuel ?? "-"}
                       </p>
                     </div>
                   </div>
@@ -195,7 +216,7 @@ const VehicleDetail = () => {
                     <div>
                       <p className="text-xs text-muted-foreground">Motor</p>
                       <p className="font-semibold text-foreground text-sm">
-                        {vehicle.specs.motor.split(" ")[0]}
+                        {(vehicle.specs.motor || "-").split(" ")[0]}
                       </p>
                     </div>
                   </div>
@@ -207,7 +228,7 @@ const VehicleDetail = () => {
                     Sobre o Veículo
                   </h2>
                   <p className="text-muted-foreground leading-relaxed">
-                    {vehicle.description}
+                    {vehicle.description ?? ""}
                   </p>
                 </div>
 
@@ -269,7 +290,7 @@ const VehicleDetail = () => {
                       <div>
                         <p className="text-xs text-muted-foreground">Lugares</p>
                         <p className="font-medium text-foreground">
-                          {vehicle.specs.lugares} lugares
+                          {vehicle.specs.lugares ?? "-"} lugares
                         </p>
                       </div>
                     </div>
@@ -278,7 +299,7 @@ const VehicleDetail = () => {
                       <div>
                         <p className="text-xs text-muted-foreground">Portas</p>
                         <p className="font-medium text-foreground">
-                          {vehicle.specs.portas} portas
+                          {vehicle.specs.portas ?? "-"} portas
                         </p>
                       </div>
                     </div>
@@ -327,7 +348,7 @@ const VehicleDetail = () => {
                 className="card-premium p-6 sticky top-28"
               >
                 <p className="text-3xl font-display font-bold text-primary mb-4">
-                  {vehicle.price}
+                  {vehicle.price ?? ""}
                 </p>
                 <div className="space-y-3">
                   <a
@@ -350,12 +371,12 @@ const VehicleDetail = () => {
 
               {/* Financing Simulator */}
               <FinancingSimulator
-                vehiclePrice={vehicle.priceNumber}
-                vehicleName={vehicle.name}
+                vehiclePrice={(vehicle.priceCents ?? 0) / 100}
+                vehicleName={vehicle.title}
               />
 
               {/* Interest Form */}
-              <InterestForm vehicleName={vehicle.name} />
+              <InterestForm vehicleId={vehicle.id} vehicleName={vehicle.title} />
             </div>
           </div>
 
@@ -370,7 +391,7 @@ const VehicleDetail = () => {
               Outros Veículos que Você Pode Gostar
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
-              {vehicles
+              {(relatedQ.data || [])
                 .filter((v) => v.id !== vehicle.id)
                 .slice(0, 3)
                 .map((v) => (
@@ -380,21 +401,25 @@ const VehicleDetail = () => {
                     className="card-premium group"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden rounded-t-xl">
-                      <img
-                        src={v.image}
-                        alt={v.name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
+                      {v.coverImageUrl ? (
+                        <img
+                          src={v.coverImageUrl}
+                          alt={v.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-secondary/40" />
+                      )}
                     </div>
                     <div className="p-4">
                       <h3 className="font-display font-bold text-foreground group-hover:text-primary transition-colors">
-                        {v.name}
+                        {v.title}
                       </h3>
                       <p className="text-xl font-bold text-primary mt-1">
-                        {v.price}
+                        {v.price ?? ""}
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {v.year} • {v.km}
+                        {v.year ?? "-"} • {formatKm(v.mileageKm) || "-"}
                       </p>
                     </div>
                   </Link>

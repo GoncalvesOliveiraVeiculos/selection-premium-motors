@@ -2,12 +2,14 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Send, User, Phone, Mail, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
 
 interface InterestFormProps {
+  vehicleId: number;
   vehicleName: string;
 }
 
-const InterestForm = ({ vehicleName }: InterestFormProps) => {
+const InterestForm = ({ vehicleId, vehicleName }: InterestFormProps) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
@@ -26,12 +28,24 @@ const InterestForm = ({ vehicleName }: InterestFormProps) => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    try {
+      await api.createLead({
+        vehicleId,
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        message: formData.message,
+        source: "vehicle_interest_form",
+      });
 
-    // Simular envio e redirecionar para WhatsApp
-    setTimeout(() => {
+      toast({
+        title: "Interesse registrado!",
+        description: "Enviamos seus dados. Você pode continuar pelo WhatsApp se quiser.",
+      });
+
       const whatsappMessage = encodeURIComponent(
         `*Formulário de Interesse*\n\n` +
           `*Veículo:* ${vehicleName}\n` +
@@ -40,19 +54,23 @@ const InterestForm = ({ vehicleName }: InterestFormProps) => {
           `*E-mail:* ${formData.email}\n\n` +
           `*Mensagem:*\n${formData.message}`
       );
+      window.open(`https://wa.me/5531993601885?text=${whatsappMessage}`, "_blank");
 
-      window.open(
-        `https://wa.me/5531993601885?text=${whatsappMessage}`,
-        "_blank"
-      );
-
-      toast({
-        title: "Interesse registrado!",
-        description: "Você será redirecionado para o WhatsApp.",
+      setFormData({
+        name: "",
+        phone: "",
+        email: "",
+        message: `Olá! Tenho interesse no ${vehicleName}. Gostaria de mais informações.`,
       });
-
+    } catch (err) {
+      toast({
+        title: "Erro ao enviar",
+        description: String((err as Error)?.message || err),
+        variant: "destructive",
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 500);
+    }
   };
 
   return (

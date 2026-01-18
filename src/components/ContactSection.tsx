@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { MapPin, Phone, MessageCircle, Clock, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
 
 const ContactSection = () => {
   const ref = useRef(null);
@@ -14,21 +15,35 @@ const ContactSection = () => {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const message = encodeURIComponent(
       `Olá! Meu nome é ${formData.name}. ${formData.message} Meu telefone: ${formData.phone}`
     );
     
-    window.open(`https://wa.me/5531997864381?text=${message}`, "_blank");
-    
-    toast({
-      title: "Redirecionando para WhatsApp",
-      description: "Complete seu contato pelo WhatsApp!",
-    });
-    
-    setFormData({ name: "", phone: "", message: "" });
+    try {
+      await api.createLead({
+        name: formData.name,
+        phone: formData.phone,
+        message: formData.message,
+        source: "contact_section",
+      });
+
+      toast({
+        title: "Mensagem registrada!",
+        description: "Salvamos seus dados. Você pode finalizar o contato pelo WhatsApp.",
+      });
+
+      window.open(`https://wa.me/5531997864381?text=${message}`, "_blank");
+      setFormData({ name: "", phone: "", message: "" });
+    } catch (err) {
+      toast({
+        title: "Erro ao enviar",
+        description: String((err as Error)?.message || err),
+        variant: "destructive",
+      });
+    }
   };
 
   return (
